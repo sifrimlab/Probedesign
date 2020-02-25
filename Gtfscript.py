@@ -38,13 +38,13 @@ record_dict = SeqIO.index('/home/ceyhun/gencode.v33.pc_transcripts.fixed.fa', "f
 print(record_dict["ENST00000361789.2"])
 
 #how to call up multiple transcripts and get their sequence_
+# This would be were User inputs transcript codes to look up and find probes for
 keys = ['ENST00000393001.1','ENST00000361789.2']
-
+#Make empty list to write to during lookup
+#loop in keys and every new key, decode it and write/add the complement to seqs
 seqs = []
 for key in keys:
-    seqs.append(record_dict.get_raw(key).decode())
-
-print(seqs)
+    seqs.append(genes[key][:].complement)
 
 
 
