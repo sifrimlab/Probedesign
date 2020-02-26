@@ -46,7 +46,7 @@ seqs = []
 for key in keys:
     seqs.append(genes[key][:].complement)
 
-
+print(seqs)
 
 # Taking fasta file and changing recods so that it only has the first description
 # outputfasta = open("/home/ceyhun/gencode.v33.pc_transcripts.fixed.fa","w")
