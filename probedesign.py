@@ -42,7 +42,7 @@ with open(readout_file, newline='') as csvfile:
 
 readout_ids = find_barcode(transcript)
 outputfasta = open("/home/ceyhun/encoding_probes.readoutids.fa","w")
-for record in SeqIO.parse("/home/ceyhun/firstprobedesign_seq30mer.20overlap..split","fasta"):
+for record in SeqIO.parse("/home/ceyhun/Probe_complement_seq30mer.20overlap..split","fasta"):
         s = random.sample(readout_ids,3)
 
         readout_seq = [results[i] for i in s]
