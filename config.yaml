@@ -1,0 +1,36 @@
+files:
+    transcripts: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/test_transcript_file.txt
+    gencode: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/gencode.v33.pc_transcripts.fixed.fa
+    readout: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/Readout_probes_information.csv
+    barcode: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/barcodes_merfish.csv
+
+path:
+    src: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/src/
+
+primers:
+    forward: GGGCCACGTCCTCAATCGAC
+    reverse: CCCTCGCCAAGGTTCGCTAG
+
+inputs:
+    kmer_fasta:
+
+output:
+    encoding_probes: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/output/encoding_probes.fasta
+    complement_sequence: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/output/complement_sequence.fasta
+    split_complement_sequence: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/output/split_complement_sequence.fasta
+    filtered_probes: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/output/filtered_probes.fasta
+    probe_stats: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/output/probe_stats.csv
+
+exec:
+    faidx: /Users/u0041034/miniconda3/envs/Ceyhun_ProbeDesigner/bin/faidx
+    pyfasta: /Users/u0041034/miniconda3/envs/Ceyhun_ProbeDesigner/bin/pyfasta
+    python: /Users/u0041034/miniconda3/envs/Ceyhun_ProbeDesigner/bin/python
+
+parameters:
+    kmer_length: 30
+    kmer_overlap: 20
+    GC_lower_bound: 43
+    GC_upper_bound: 63
+    Temp_lower_bound: 66
+    Temp_upper_bound: 76
+    probe_length: 134
