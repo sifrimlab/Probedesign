@@ -33,4 +33,4 @@ parameters:
     GC_upper_bound: 63
     Temp_lower_bound: 66
     Temp_upper_bound: 76
-    probe_length: 134
+    probe_length: 135
