@@ -51,7 +51,7 @@ if __name__ == "__main__":
                 if record.id.split("_")[0] == transcript:
                     s = random.sample(readout_ids,3)
                     readout_seq = [results[i] for i in s]
-                    record.seq = fw_primer +"A" + Seq(readout_seq[0]) + "A" + record.seq + "A" + Seq(readout_seq[1]) + Seq(readout_seq[2]) + "A" + rv_primer
+                    record.seq = fw_primer +"A" + Seq(readout_seq[0]) + "A" + record.seq + "A" + Seq(readout_seq[1]) + "A" + Seq(readout_seq[2]) + "A" + rv_primer
                     record.id =  record.id +"_" + "_".join(s)
                     print(record.id)
                     record.description = ""
