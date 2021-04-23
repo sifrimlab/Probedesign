@@ -6,7 +6,7 @@ transcript_file = config["files"]["transcripts"]
 transcripts = open(transcript_file,'r').readlines()
 transcripts = [x.rstrip() for x in transcripts]
 faidx_input = [t+": " for t in transcripts]
-
+github_test = "github test"
 
 complement_sequence = config["output"]["complement_sequence"]
 split_complement_sequence = config["output"]["split_complement_sequence"]
