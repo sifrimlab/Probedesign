@@ -132,3 +132,16 @@ db='nr', evalue=0.001)
 print(blastx_cline)
     blastx -out opuntia.xml -outfmt 5 -query opuntia.fasta -db nr -evalue 0.001
 stdout, stderr = blastx_cline()
+
+
+### Checking the results
+from Bio.Blast import NCBIXML
+E_VALUE_THRESH = 1e-20
+for record in NCBIXML.parse(open("results.xml")):
+    if record.alignments:
+        print("\n")
+        print("query: %s" % record.query[:100])
+        for align in record.alignments:
+           for hsp in align.hsps:
+              if hsp.expect < E_VALUE_THRESH:
+                 print("match: %s " % align.title[:100])
