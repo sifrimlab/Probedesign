@@ -15,23 +15,25 @@ kmer_length: 30
 kmer_overlap: 20
 probe_length: 135
 
+
+def split_complement(transcript_file):
 ### Read in transcript files(genes of interest) -> transcripts in ensembleID form eg. ENSG00000010404
-with open(transcript_file,"r") as transcripts:
-        transcripts = transcripts.readlines()
-        transcripts = [x.rstrip() for x in transcripts]
+        ### Read in gencode reference sequence and take the reverse complement of the transcripts in transcript_file(genes of interest)
+        genes = Fasta('gencode.v33.pc_transcripts.fixed.fa')
+        complement_sequence = []
+        with open(transcript_file,"r") as transcripts:
+                transcripts = transcripts.readlines()
+                transcripts = [x.rstrip() for x in transcripts]
+        # with open("complement_sequence.fasta","w") as output:
+        for transcript in transcripts:
+            # Testing different reading methods
+        #        output.append(genes[transcript].complement)
+        #        output.append(genes.get.seq(transcript,rc=True))
+        #    complement_sequence.append(genes[transcript].complement)
+            complement_sequence.append(genes.get.seq(transcript,rc=True))
 
-### Read in gencode reference sequence and take the reverse complement of the transcripts in transcript_file(genes of interest)
-genes = Fasta('gencode.v33.pc_transcripts.fixed.fa')
-# with open("complement_sequence.fasta","w") as output:
-complement_sequence = []
-    for transcript in transcripts:
-        # Testing different reading methods
-#        output.append(genes[transcript].complement)
-#        output.append(genes.get.seq(transcript,rc=True))
-        complement_sequence.append(genes[transcript].complement)
-        complement_sequence.append(genes.get.seq(transcript,rc=True))
-
-split_complement_sequence = chunks(complement_sequence,chunk_size=30,overlap=20)
+    split_complement_sequence = chunks(complement_sequence,chunk_size=30,overlap=20)
+    return(split_complement_sequence)
 
 def find_barcode(transcript, barcode_file):
     readout_selected = []
@@ -80,31 +82,32 @@ if __name__ == "__main__":
                         return
 
 
+def filter_probes(encoding_probes,GC_lower_bound=43,GC_upper_bound=63,templowerbound=66,tempupperbound=67,probe_length=135):
+    filters= {}
+    with open("filtered_probes.fasta","w") as output_filtered:
+        with open("probe_stats.csv","w", newline='') as filter_file:
+            fieldnames =["probe_id","probelength","GC","meltingtemp", "sequence"]
+            csv_writer=csv.DictWriter(filter_file,fieldnames=fieldnames)
+            csv_writer.writeheader()
+            # for record in SeqIO.parse("encoding_probes.fasta","fasta"):
+            for record in SeqIO.parse(encoding_probes,"fasta"):
+                filters["probelength"] = len(record.seq)
+                filters["probe_id"] = (record.id)
+                filters["GC"] = (GC(record.seq))
+                filters["meltingtemp"] = (mt.Tm_NN(record.seq))
+                filters["sequence"] = (record.seq)
+                csv_writer.writerow(filters)
+                #print(filters)
 
-filters= {}
-with open("filtered_probes.fasta","w") as output_filtered:
-
-    with open("probe_stats.csv","w", newline='') as filter_file:
-        fieldnames =["probe_id","probelength","GC","meltingtemp", "sequence"]
-        csv_writer=csv.DictWriter(filter_file,fieldnames=fieldnames)
-        csv_writer.writeheader()
-        for record in SeqIO.parse("encoding_probes.fasta","fasta"):
-            filters["probelength"] = len(record.seq)
-            filters["probe_id"] = (record.id)
-            filters["GC"] = (GC(record.seq))
-            filters["meltingtemp"] = (mt.Tm_NN(record.seq))
-            filters["sequence"] = (record.seq)
-            csv_writer.writerow(filters)
-            #print(filters)
-
-            if (    len(record.seq) == probe_length
-            and GC(record.seq) > GClowerbound
-            and GC(record.seq) < GCupperbound
-            and float(('%0.2f' % mt.Tm_NN(record.seq))) > templowerbound
-            and float(('%0.2f' % mt.Tm_NN(record.seq))) < tempupperbound
-            ):
-            correctlength_seq.append(record)
-            SeqIO.write(record, output_filtered, "fasta")
+                if (    len(record.seq) == probe_length
+                and GC(record.seq) > GClowerbound
+                and GC(record.seq) < GCupperbound
+                and float(('%0.2f' % mt.Tm_NN(record.seq))) > templowerbound
+                and float(('%0.2f' % mt.Tm_NN(record.seq))) < tempupperbound
+                ):
+                correctlength_seq.append(record)
+                SeqIO.write(record, output_filtered, "fasta")
+                return
 
 ### blasting the filtered probes over the internet
 from Bio.Blast import NCBIWWW
