@@ -1,3 +1,5 @@
+pip install wimpy
+pip install pyfaidx
 from wimpy import chunks
 from Bio import SeqIO
 from Bio.SeqUtils import MeltingTemp as mt
@@ -15,11 +17,15 @@ kmer_length: 30
 kmer_overlap: 20
 probe_length: 135
 
+%pwd
+import os
+os.listdir()
 
+# genes = Fasta('C:/Users/cey_c/OneDrive/Bureaublad/Probedesign_labrotation/gencode.v33.pc_transcripts.fixed.fa')
 def split_complement(transcript_file):
 ### Read in transcript files(genes of interest) -> transcripts in ensembleID form eg. ENSG00000010404
         ### Read in gencode reference sequence and take the reverse complement of the transcripts in transcript_file(genes of interest)
-        genes = Fasta('gencode.v33.pc_transcripts.fixed.fa')
+        genes = Fasta('C:/Users/cey_c/OneDrive/Bureaublad/Probedesign_labrotation/gencode.v33.pc_transcripts.fixed.fa')
         complement_sequence = []
         with open(transcript_file,"r") as transcripts:
                 transcripts = transcripts.readlines()
@@ -29,11 +35,16 @@ def split_complement(transcript_file):
             # Testing different reading methods
         #        output.append(genes[transcript].complement)
         #        output.append(genes.get.seq(transcript,rc=True))
-        #    complement_sequence.append(genes[transcript].complement)
-            complement_sequence.append(genes.get.seq(transcript,rc=True))
+            complement_sequence.append(-genes[transcript][:])
 
-    split_complement_sequence = chunks(complement_sequence,chunk_size=30,overlap=20)
-    return(split_complement_sequence)
+        for i in range(len(complement_sequence)):
+            temp_file.write('>' + complement_sequence[i].name + "\n")
+            temp_file.write(complement_sequence[i].seq + "\n")
+
+        # split_complement_sequence = chunks(complement_sequence,chunk_size=30,overlap=20)
+        return(temp_file)
+
+### TODO: SPLIT SEQUENCE IN TO SEQUENCES WITH OVERLAP
 
 def find_barcode(transcript, barcode_file):
     readout_selected = []
@@ -49,7 +60,7 @@ def find_barcode(transcript, barcode_file):
                 return(readout_selected)
         return(False)
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     # TODO Transcript names are added to the barcoding file to get corresponding bits and RScodes
 
     # READ CONFIG
@@ -79,7 +90,7 @@ if __name__ == "__main__":
                         #print(record.seq)
                         SeqIO.write(record, output_encode, "fasta")
 
-                        return
+        return(output_encode)
 
 
 def filter_probes(encoding_probes,GC_lower_bound=43,GC_upper_bound=63,templowerbound=66,tempupperbound=67,probe_length=135):
@@ -105,9 +116,10 @@ def filter_probes(encoding_probes,GC_lower_bound=43,GC_upper_bound=63,templowerb
                 and float(('%0.2f' % mt.Tm_NN(record.seq))) > templowerbound
                 and float(('%0.2f' % mt.Tm_NN(record.seq))) < tempupperbound
                 ):
-                correctlength_seq.append(record)
-                SeqIO.write(record, output_filtered, "fasta")
+                    correctlength_seq.append(record)
+                    SeqIO.write(record, output_filtered, "fasta")
                 return
+
 
 ### blasting the filtered probes over the internet
 from Bio.Blast import NCBIWWW
