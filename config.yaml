@@ -1,11 +1,11 @@
 files:
-    transcripts: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/test_transcript_file.txt
-    gencode: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/gencode.v33.pc_transcripts.fixed.fa
-    readout: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/Readout_probes_information.csv
-    barcode: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/barcodes_merfish.csv
-
+    transcripts: Probedesign/test_transcript_file.txt
+    gencode: Probedesign/gencode.v37.transcripts.fa
+    readout: Probedesign/Readout_probes_information.csv
+    barcode: Probedesign/barcodes_merfish.csv
+    reference: "ALEJANDRO TELL ME WHEEEEEEEERE"
 path:
-    src: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/src/
+    src: Probedesign/src/
 
 primers:
     forward: GGGCCACGTCCTCAATCGAC
@@ -15,16 +15,22 @@ inputs:
     kmer_fasta:
 
 output:
-    encoding_probes: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/output/encoding_probes.fasta
-    complement_sequence: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/output/complement_sequence.fasta
-    split_complement_sequence: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/output/split_complement_sequence.fasta
-    filtered_probes: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/output/filtered_probes.fasta
-    probe_stats: /Users/u0041034/Projects/Ceyhun_ProbeDesigner/Probedesign/output/probe_stats.csv
+    encoding_probes: Probedesign/output/encoding_probes.fasta
+    complement_sequence: Probedesign/output/complement_sequence.fasta
+    split_complement_sequence: Probedesign/output/split_complement_sequence.fasta
+    filtered_probes: Probedesign/output/filtered_probes.fasta
+    probe_stats: Probedesign/output/probe_stats.csv
+    mapped_reads: Probedesign/output/mapped_reads/filtered_probes.bam
+    sorted_reads: Probedesign/output/sorted_reads/sorted_filtered_probes.bam
+    sorted_reads_index: Probedesign/output/sorted_reads/sorted_filtered_probes.bai
+    blastdb: Probedesign/output/blastdb/filtered_probes
+    blast_results: Probedesign/output/blast_results.out
 
 exec:
-    faidx: /Users/u0041034/miniconda3/envs/Ceyhun_ProbeDesigner/bin/faidx
-    pyfasta: /Users/u0041034/miniconda3/envs/Ceyhun_ProbeDesigner/bin/pyfasta
-    python: /Users/u0041034/miniconda3/envs/Ceyhun_ProbeDesigner/bin/python
+    faidx: /data/leuven/337/vsc33740/miniconda3/envs/snakemake/bin/faidx
+    pyfasta: /data/leuven/337/vsc33740/miniconda3/envs/snakemake/bin/pyfasta
+    python: /data/leuven/337/vsc33740/miniconda3/envs/snakemake/bin/python
+    bwa: /data/leuven/337/vsc33740/miniconda3/envs/snakemake/bin/bwa
 
 parameters:
     kmer_length: 30
