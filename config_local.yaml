@@ -1,0 +1,43 @@
+files:
+    transcripts: test_transcript_file.txt
+    gencode: gencode.v37.transcripts.fa
+    readout: Readout_probes_information.csv
+    barcode: barcodes_merfish.csv
+    index: /mnt/c/Users/cey_c/OneDrive/Documenten/A-Thesis/Genome-Index
+
+path:
+    src: src/
+
+primers:
+    forward: GGGCCACGTCCTCAATCGAC
+    reverse: CCCTCGCCAAGGTTCGCTAG
+
+inputs:
+    kmer_fasta:
+
+output:
+    encoding_probes: output/encoding_probes.fasta
+    complement_sequence: output/complement_sequence.fasta
+    split_complement_sequence: output/split_complement_sequence.fasta
+    filtered_probes: output/filtered_probes.fasta
+    complement_probes: output/complement_probes.fasta
+    probe_stats: output/probe_stats.csv
+    filtered_probes_alligned: output/mapped_reads/filtered_probes_alligned
+
+
+    blastdb: output/blastdb/complement_probes_db
+    blast_results: output/blast_results.out
+
+# exec:
+#     faidx: /data/leuven/337/vsc33740/miniconda3/envs/snakemake/bin/faidx
+#     pyfasta: /data/leuven/337/vsc33740/miniconda3/envs/snakemake/bin/pyfasta
+#     python: /data/leuven/337/vsc33740/miniconda3/envs/snakemake/bin/python
+
+parameters:
+    kmer_length: 30
+    kmer_overlap: 20
+    GC_lower_bound: 43
+    GC_upper_bound: 63
+    Temp_lower_bound: 66
+    Temp_upper_bound: 76
+    probe_length: 135
