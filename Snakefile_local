@@ -92,7 +92,7 @@ rule filter_probes:
         python {src_path}/filtering_probes.py config_local.yaml
         '''
 ### DO ALLIGNIN WITH STAR
-### only select probes with unique hit
+### only select probes with unique hit ( have to lower the  filter because otherwise too short and 0 mathes)
 rule allign_probes:
     input:
         index_files,
@@ -101,9 +101,11 @@ rule allign_probes:
         filtered_probes_alligned+"Aligned.out.sam"
     shell:
         '''
-        STAR --genomeDir {index_files} --runThreadN 6 --readFilesIn {filtered_probes} --outFileNamePrefix {filtered_probes_alligned}
+        STAR --genomeDir {index_files} --runThreadN 6 --readFilesIn {filtered_probes} \
+         --outFileNamePrefix {filtered_probes_alligned} \
+         --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0 --outFilterMatchNmin 0
         '''
-## add rule
+## add rule to filter based on unique matches
 
 
 rule complement_sequence_probes:
