@@ -17,13 +17,20 @@ inputs:
 
 output:
     encoding_probes: output/encoding_probes.fasta
+    encoding_probes_for_alligning: output/encoding_probes_for_alligning.fasta
+    probes_for_alligning: output/probes_for_alligning.fasta
     complement_sequence: output/complement_sequence.fasta
     split_complement_sequence: output/split_complement_sequence.fasta
+    split_probes_for_alligning: output/split_probes_for_alligning.fasta
     filtered_probes: output/filtered_probes.fasta
+    filtered_probes_for_alligning: output/filtered_probes_for_alligning.fasta
     complement_probes: output/complement_probes.fasta
     probe_stats: output/probe_stats.csv
-    filtered_probes_alligned: output/mapped_reads/filtered_probes_alligned
-
+    filtered_probes_alligned: output/mapped_reads/filtered_probes_alligned-
+    filtered_probes_alligned_selected_sam: output/mapped_reads/filtered_probes_alligned_selected.sam
+    filtered_probes_alligned_selected_probenames:  output/mapped_reads/filtered_probes_alligned_selected_probenames.txt
+    filtered_probes_alligned_selected_probes_fasta: output/results/filtered_probes_alligned_selected_probes_fasta.fasta
+    Final_Probe_results: output/results/Final_Probe_results.csv
 
     blastdb: output/blastdb/complement_probes_db
     blast_results: output/blast_results.out

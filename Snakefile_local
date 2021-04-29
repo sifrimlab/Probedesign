@@ -8,22 +8,26 @@ transcripts = [x.rstrip() for x in transcripts]
 faidx_input = [t+": " for t in transcripts]
 
 complement_sequence = config["output"]["complement_sequence"]
+probes_for_alligning = config["output"]["probes_for_alligning"]
 split_complement_sequence = config["output"]["split_complement_sequence"]
+split_probes_for_alligning = config["output"]["split_probes_for_alligning"]
 encoding_probes = config["output"]["encoding_probes"]
+encoding_probes_for_alligning = config["output"]["encoding_probes_for_alligning"]
 filtered_probes = config["output"]["filtered_probes"]
+filtered_probes_for_alligning = config["output"]["filtered_probes_for_alligning"]
 probe_stats = config["output"]["probe_stats"]
 filtered_probes_alligned=config["output"]["filtered_probes_alligned"]
 complement_probes = config["output"]["complement_probes"]
 blastdb = config["output"]["blastdb"]
 blast_results = config["output"]["blast_results"]
-
-
-
+filtered_probes_alligned_selected_sam = config["output"]["filtered_probes_alligned_selected_sam"]
+filtered_probes_alligned_selected_probenames = config["output"]["filtered_probes_alligned_selected_probenames"]
+filtered_probes_alligned_selected_probes_fasta = config["output"]["filtered_probes_alligned_selected_probes_fasta"]
 gencode_file = config["files"]["gencode"]
 readout_file = config["files"]["readout"]
 barcode_file = config["files"]["barcode"]
 index_files = config["files"]["index"]
-
+Final_Probe_results = config["output"]["Final_Probe_results"]
 
 #Execs
 # faidx_exec = config["exec"]["faidx"]
@@ -40,35 +44,49 @@ src_path = config["path"]["src"]
 rule all:
     input:
         complement_sequence,
+        probes_for_alligning,
         split_complement_sequence,
+        split_probes_for_alligning,
         encoding_probes,
+        encoding_probes_for_alligning,
         filtered_probes,
-        probe_stats,
+        # probe_stats,
         filtered_probes_alligned+"Aligned.out.sam",
         complement_probes,
         blastdb+".nsq",
         blast_results,
+        filtered_probes_alligned_selected_sam,
+        filtered_probes_alligned_selected_probenames,
+        filtered_probes_alligned_selected_probes_fasta,
+        Final_Probe_results
 
 rule complement_sequence:
     input:
         transcript_file
     output:
-        complement_sequence
+        complement_sequence,
+        probes_for_alligning
     shell:
         '''
-        faidx --complement {gencode_file} {faidx_input} > {output}
+        faidx --complement {gencode_file} {faidx_input} > {complement_sequence}
+        faidx  {gencode_file} {faidx_input} > {probes_for_alligning}
         '''
 rule split_sequence:
     input:
-        complement_sequence
+        complement_sequence,
+        probes_for_alligning
     output:
-        split_complement_sequence
+        split_complement_sequence,
+        split_probes_for_alligning
     params:
-        tmp_file=complement_sequence.replace(".fasta","")
+        tmp_file=complement_sequence.replace(".fasta",""),
+        tmp_file2=probes_for_alligning.replace(".fasta","")
     shell:
         '''
-        pyfasta split -n1 -k{kmer_length} -o{kmer_overlap} {input}
-        mv {params.tmp_file}.split.{kmer_length}mer.{kmer_overlap}overlap.fasta {output}
+        pyfasta split -n1 -k{kmer_length} -o{kmer_overlap} {complement_sequence}
+        pyfasta split -n1 -k{kmer_length} -o{kmer_overlap} {probes_for_alligning}
+        mv {params.tmp_file}.split.{kmer_length}mer.{kmer_overlap}overlap.fasta {split_complement_sequence}
+        mv {params.tmp_file2}.split.{kmer_length}mer.{kmer_overlap}overlap.fasta {split_probes_for_alligning}
         '''
 rule design_probes:
     input:
@@ -76,23 +94,26 @@ rule design_probes:
         readout_file,
         barcode_file
     output:
-        encoding_probes
+        encoding_probes,
+        encoding_probes_for_alligning
     shell:
         '''
         python {src_path}/probedesign.py config_local.yaml
+        python {src_path}/probedesign_allignment_probes.py config_local.yaml
         '''
+
 rule filter_probes:
     input:
         encoding_probes
     output:
         filtered_probes,
-        probe_stats
+        filtered_probes_for_alligning,
+        # probe_stats
     shell:
         '''
+        python {src_path}/filtering_probes_allignment.py config_local.yaml
         python {src_path}/filtering_probes.py config_local.yaml
         '''
-### DO ALLIGNIN WITH STAR
-### only select probes with unique hit ( have to lower the  filter because otherwise too short and 0 mathes)
 rule allign_probes:
     input:
         index_files,
@@ -101,27 +122,42 @@ rule allign_probes:
         filtered_probes_alligned+"Aligned.out.sam"
     shell:
         '''
-        STAR --genomeDir {index_files} --runThreadN 6 --readFilesIn {filtered_probes} \
+        STAR --genomeDir {index_files} --runThreadN 6 --readFilesIn {filtered_probes_for_alligning} \
          --outFileNamePrefix {filtered_probes_alligned} \
          --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0 --outFilterMatchNmin 0
         '''
-## add rule to filter based on unique matches
-
-
-rule complement_sequence_probes:
+rule select_alligned:
     input:
-        filtered_probes
+        filtered_probes_alligned+"Aligned.out.sam"
+## add rule to filter based on unique matches
     output:
-        complement_probes
+        filtered_probes_alligned_selected_sam,
+        filtered_probes_alligned_selected_probenames
     shell:
         '''
-        faidx --complement {input} > {complement_probes}
+        samtools view -q 10 {input} > {filtered_probes_alligned_selected_sam}
+        cut -f1 {filtered_probes_alligned_selected_sam} > {filtered_probes_alligned_selected_probenames}
+
+        samtools view -S -b -q 10 {input} > output/probes_visualizing.bam
+        samtools sort output/probes_visualizing.bam  > output/sorted_probes_visualizing.bam
+        samtools index output/sorted_probes_visualizing.bam
+        '''
+rule complement_sequence_probes:
+    input:
+        filtered_probes,
+        filtered_probes_alligned_selected_probenames
+    output:
+        complement_probes,
+        filtered_probes_alligned_selected_probes_fasta
+    shell:
+        '''
+        set +o pipefail;
+        cat {filtered_probes_alligned_selected_probenames} | faidx {filtered_probes} > {filtered_probes_alligned_selected_probes_fasta}
+        cat {filtered_probes_alligned_selected_probenames} | faidx --complement {filtered_probes} > {complement_probes}
         '''
 rule create_blastdb:
     input:
-        #testing with previous
         complement_probes
-        #add here allignment filtered probe_stats
     output:
         #MAKE BLASTDB THE COMPLEMENT OF THE PROBES
         blastdb+".nsq"
@@ -133,10 +169,24 @@ rule create_blastdb:
 rule blast_probes:
     input:
         blastdb+".nsq",
-        filtered_probes,
+        filtered_probes_alligned_selected_probes_fasta,
     output:
         blast_results
     shell:
         '''
-        blastn -db {blastdb} -query {filtered_probes} -out {output}
+        blastn -db {blastdb} -query {filtered_probes_alligned_selected_probes_fasta} -out {output}
         '''
+rule probe_results:
+    input:
+        filtered_probes_alligned_selected_probes_fasta,
+    output:
+        Final_Probe_results,
+    shell:
+        '''
+        python {src_path}/results.py config_local.yaml
+        '''
+
+## end stats/end report
+
+# how many probes per gene after all the filtering_
+# visualize IGV
