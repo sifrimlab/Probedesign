@@ -12,9 +12,14 @@ from Bio.SeqUtils import GC
 from csv import DictWriter
 config = yaml.load(open(sys.argv[1],'r'), Loader=yaml.FullLoader)
 
+# Filtering probes based on predefined values, creating a probe stats csv for downstream freedom of changing filters to achieve desired probes.
+
+
+# Creating a Results folder if it doesn't exist yet
 if not os.path.exists("Results/"):
      os.mkdir("Results/")
 
+# Reading in the required config files
 correctlength_seq = []
 GClowerbound = config["parameters"]["GC_lower_bound"]
 GCupperbound = config["parameters"]["GC_upper_bound"]
@@ -28,11 +33,10 @@ uniquely_mapped_probes_probenames=open(config["output"]["uniquely_mapped_probes_
 filtered_names = uniquely_mapped_probes_probenames.read().splitlines()
 probe_stats = config["output"]["probe_stats"]
 
-
+# Creating the probe stats csv
 filters= {}
 with open(probe_stats,"w", newline='') as filter_file:
     fieldnames =["probe_id","uniquely_mapped","probelength","GC","meltingtemp", "sequence"]
-    # fieldnames =["probe_id","probelength","GC","meltingtemp", "sequence"]
     csv_writer=csv.DictWriter(filter_file,fieldnames=fieldnames)
     csv_writer.writeheader()
     for record in SeqIO.parse(config["output"]["encoding_probes"],"fasta"):
@@ -44,7 +48,8 @@ with open(probe_stats,"w", newline='') as filter_file:
             filters["sequence"] = (record.seq)
             csv_writer.writerow(filters)
             #print(filters)
-
+            
+            # If the probes confirm to chosen filters below write them out as filtered probes    
             if (    len(record.seq) == probe_length
                 and GC(record.seq) > GClowerbound
                 and GC(record.seq) < GCupperbound
