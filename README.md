@@ -1,5 +1,5 @@
 # Probedesign
-Explain here how to get this from docker with conda environment
+## TODO: Explain here how to get this from docker with conda environment
 
 To run the pipeline run command ```snakemake --snakefile snakemake_probedesign```
 For aditional snakemake command line specifications such as cores and threads check _https://snakemake.readthedocs.io/en/stable/executing/cli.html_.
