@@ -2,6 +2,8 @@ from Bio import SeqIO
 import yaml
 import sys
 
+# Taking only probes who both passed the filtering step and are uniquely alligned
+
 config = yaml.load(open(sys.argv[1],'r'), Loader=yaml.FullLoader)
 
 filtered_probes = config["output"]["filtered_probes"]
