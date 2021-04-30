@@ -1,0 +1,176 @@
+import glob
+
+configfile: "config.yaml"
+
+transcript_file = config["files"]["transcripts"]
+transcripts = open(transcript_file,'r').readlines()
+transcripts = [x.rstrip() for x in transcripts]
+faidx_input = [t+": " for t in transcripts]
+
+probes_for_alligning = config["output"]["probes_for_alligning"]
+complement_initial_probes = config["output"]["complement_initial_probes"]
+split_probes_for_alligning = config["output"]["split_probes_for_alligning"]
+split_complement_initial_probes = config["output"]["split_complement_initial_probes"]
+uniquely_mapped_probes=config["output"]["uniquely_mapped_probes"]
+uniquely_mapped_probes_probenames = config["output"]["uniquely_mapped_probes_probenames"]
+uniquely_mapped_probes_selected_sam = config["output"]["uniquely_mapped_probes_selected_sam"]
+split_complement_sequence = config["output"]["split_complement_sequence"]
+encoding_probes = config["output"]["encoding_probes"]
+filtered_probes = config["output"]["filtered_probes"]
+probe_stats = config["output"]["probe_stats"]
+uniquely_mapped_probes_selected_probes_fasta = config["output"]["uniquely_mapped_probes_selected_probes_fasta"]
+complement_probes = config["output"]["complement_probes"]
+blastdb = config["output"]["blastdb"]
+blast_results = config["output"]["blast_results"]
+Final_Probe_results = config["output"]["Final_Probe_results"]
+
+gencode_file = config["files"]["gencode"]
+readout_file = config["files"]["readout"]
+barcode_file = config["files"]["barcode"]
+index_files = config["files"]["index"]
+
+
+
+#Params
+kmer_length = config["parameters"]["kmer_length"]
+kmer_overlap = config["parameters"]["kmer_overlap"]
+
+#Paths:
+src_path = config["path"]["src"]
+
+rule all:
+    input:
+        probes_for_alligning,
+        complement_initial_probes,
+        split_probes_for_alligning,
+        split_complement_initial_probes,
+        uniquely_mapped_probes+"Aligned.out.sam",
+        uniquely_mapped_probes_probenames,
+        uniquely_mapped_probes_selected_sam,
+        encoding_probes,
+        filtered_probes,
+        probe_stats,
+        uniquely_mapped_probes_selected_probes_fasta,
+        complement_probes,
+        blastdb+".nsq",
+        blast_results,
+        Final_Probe_results
+
+rule transcript_sequence:
+    input:
+        transcript_file
+    output:
+        probes_for_alligning,
+        complement_initial_probes
+    shell:
+        '''
+        faidx  {gencode_file} {faidx_input} > {probes_for_alligning}
+        faidx --complement {gencode_file} {faidx_input} > {complement_initial_probes}
+        '''
+rule split_sequence:
+    input:
+        probes_for_alligning
+    output:
+        split_probes_for_alligning,
+        split_complement_initial_probes
+    params:
+        tmp_file=complement_initial_probes.replace(".fasta",""),
+        tmp_file2=probes_for_alligning.replace(".fasta","")
+    shell:
+        '''
+        pyfasta split -n1 -k{kmer_length} -o{kmer_overlap} {probes_for_alligning}
+        mv {params.tmp_file2}.split.{kmer_length}mer.{kmer_overlap}overlap.fasta {split_probes_for_alligning}
+        pyfasta split -n1 -k{kmer_length} -o{kmer_overlap} {complement_initial_probes}
+        mv {params.tmp_file}.split.{kmer_length}mer.{kmer_overlap}overlap.fasta {split_complement_initial_probes}
+        '''
+rule allign_probes:
+    input:
+        index_files,
+        split_probes_for_alligning
+    output:
+        uniquely_mapped_probes+"Aligned.out.sam"
+    shell:
+        '''
+        STAR --genomeDir {index_files} --readFilesIn {split_probes_for_alligning} \
+         --outFileNamePrefix {uniquely_mapped_probes} \
+         --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0 --outFilterMatchNmin 0
+        '''
+rule select_alligned:
+    input:
+        uniquely_mapped_probes+"Aligned.out.sam"
+    output:
+        uniquely_mapped_probes_selected_sam,
+        uniquely_mapped_probes_probenames
+    shell:
+        '''
+        samtools view -q 10 {input} > {uniquely_mapped_probes_selected_sam}
+        cut -f1 {uniquely_mapped_probes_selected_sam} > {uniquely_mapped_probes_probenames}
+
+        samtools view -S -b -q 10 {input} > Outputs/probes_visualizing.bam
+        samtools sort Outputs/probes_visualizing.bam  > Outputs/sorted_probes_visualizing.bam
+        samtools index Outputs/sorted_probes_visualizing.bam
+        '''
+rule design_probes:
+    input:
+        uniquely_mapped_probes_probenames,
+        readout_file,
+        barcode_file
+    output:
+        encoding_probes,
+    shell:
+        '''
+        python {src_path}/probedesign.py config.yaml
+        '''
+rule filter_probes:
+    input:
+        uniquely_mapped_probes_probenames,
+        encoding_probes
+    output:
+        filtered_probes,
+        probe_stats
+    shell:
+        '''
+        python {src_path}/filtering_probes.py config.yaml
+        '''
+rule complement_sequence_probes:
+    input:
+        filtered_probes,
+        uniquely_mapped_probes_probenames
+    output:
+        uniquely_mapped_probes_selected_probes_fasta
+    shell:
+        '''
+        python {src_path}/filtering_alligned_probes.py config.yaml
+        '''
+rule create_blastdb:
+    input:
+        uniquely_mapped_probes_selected_probes_fasta
+    output:
+        complement_probes,
+        blastdb+".nsq"
+    shell:
+        '''
+        faidx --complement {uniquely_mapped_probes_selected_probes_fasta} > {complement_probes}
+        makeblastdb -in {complement_probes} -dbtype nucl -parse_seqids -out {blastdb}
+        cp {complement_probes} {blastdb}
+        '''
+rule blast_probes:
+    input:
+        blastdb+".nsq",
+        uniquely_mapped_probes_selected_probes_fasta,
+    output:
+        blast_results
+    shell:
+        '''
+        blastn -db {blastdb} -query {uniquely_mapped_probes_selected_probes_fasta} -evalue 0.01 -out {output}
+        '''
+rule probe_results:
+    input:
+        probe_stats,
+        uniquely_mapped_probes_selected_probes_fasta,
+    output:
+        Final_Probe_results,
+    shell:
+        '''
+        python {src_path}/results.py config.yaml
+        '''

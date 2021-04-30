@@ -1,36 +1,37 @@
 files:
-    transcripts: Probedesign/test_transcript_file.txt
-    gencode: Probedesign/gencode.v37.transcripts.fa
-    readout: Probedesign/Readout_probes_information.csv
-    barcode: Probedesign/barcodes_merfish.csv
-    reference: "ALEJANDRO TELL ME WHEEEEEEEERE"
+    transcripts: Inputs/test_transcript_file.txt
+    gencode: Inputs/gencode.v37.transcripts.fa
+    readout: Inputs/Readout_probes_information.csv
+    barcode: Inputs/barcodes_merfish.csv
+    index: Inputs/Genome-Index
+
 path:
-    src: Probedesign/src/
+    src: src/
 
 primers:
     forward: GGGCCACGTCCTCAATCGAC
     reverse: CCCTCGCCAAGGTTCGCTAG
 
-inputs:
-    kmer_fasta:
 
 output:
-    encoding_probes: Probedesign/output/encoding_probes.fasta
-    complement_sequence: Probedesign/output/complement_sequence.fasta
-    split_complement_sequence: Probedesign/output/split_complement_sequence.fasta
-    filtered_probes: Probedesign/output/filtered_probes.fasta
-    probe_stats: Probedesign/output/probe_stats.csv
-    mapped_reads: Probedesign/output/mapped_reads/filtered_probes.bam
-    sorted_reads: Probedesign/output/sorted_reads/sorted_filtered_probes.bam
-    sorted_reads_index: Probedesign/output/sorted_reads/sorted_filtered_probes.bai
-    blastdb: Probedesign/output/blastdb/filtered_probes
-    blast_results: Probedesign/output/blast_results.out
+    probes_for_alligning: Outputs/probes_for_alligning.fasta
+    complement_initial_probes: Outputs/complement_initial_probes.fasta
+    split_probes_for_alligning: Outputs/split_probes_for_alligning.fasta
+    split_complement_initial_probes: Outputs/split_complement_initial_probes.fasta
+    uniquely_mapped_probes: Outputs/mapped_reads/uniquely_mapped_probes-
+    uniquely_mapped_probes_probenames:  Outputs/mapped_reads/uniquely_mapped_probes_probenames.txt
+    uniquely_mapped_probes_selected_sam: Outputs/mapped_reads/uniquely_mapped_probes_selected.sam
+    split_complement_sequence: Outputs/split_complement_sequence.fasta
+    encoding_probes: Outputs/encoding_probes.fasta
+    filtered_probes: Outputs/filtered_probes.fasta
+    probe_stats: Results/probe_stats.csv
+    uniquely_mapped_probes_selected_probes_fasta: Results/uniquely_mapped_probes_filtered_final.fasta
+    complement_probes: Outputs/complement_probes.fasta
+    blastdb: Outputs/blastdb/complement_probes_db
+    blast_results: Results/blast_results.out
+    Final_Probe_results: Results/Final_Probe_results.csv
 
-exec:
-    faidx: /data/leuven/337/vsc33740/miniconda3/envs/snakemake/bin/faidx
-    pyfasta: /data/leuven/337/vsc33740/miniconda3/envs/snakemake/bin/pyfasta
-    python: /data/leuven/337/vsc33740/miniconda3/envs/snakemake/bin/python
-    bwa: /data/leuven/337/vsc33740/miniconda3/envs/snakemake/bin/bwa
+
 
 parameters:
     kmer_length: 30
