@@ -6,7 +6,9 @@ import Bio
 from Bio.Seq import Seq
 import yaml
 config = yaml.load(open(sys.argv[1],'r'), Loader=yaml.FullLoader)
+# Designing the probes according to MERFISH paper https://doi.org/10.1038/s41598-018-22297-7
 
+# function for finding the barcodes for a specified transcript in the barcode_merfish file
 def find_barcode(transcript, barcode_file):
     readout_selected = []
     with open(barcode_file, newline='') as csvfile:
@@ -22,7 +24,6 @@ def find_barcode(transcript, barcode_file):
         return(False)
 
 if __name__ == "__main__":
-    # TODO Transcript names are added to the barcoding file to get corresponding bits and RScodes
 
     # READ CONFIG
     config = yaml.load(open(sys.argv[1],'r'), Loader=yaml.FullLoader)
@@ -46,7 +47,8 @@ if __name__ == "__main__":
         transcript = transcript.rstrip()
         readout_ids = find_barcode(transcript, barcode_file)
 
-
+        # For every transcript add 3 of the 4 readout_sequences, add the forward and reverse primer
+        # Add 'A' spacers between the different parts
         for record in SeqIO.parse(split_complement_initial_probes,"fasta"):
                 if record.id.split("_")[0] == transcript:
                     random.seed(30)
