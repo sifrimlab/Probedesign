@@ -112,7 +112,7 @@ rule select_alligned:
         '''
 rule design_probes:
     input:
-        uniquely_mapped_probes_probenames,
+        split_complement_initial_probes,
         readout_file,
         barcode_file
     output:
