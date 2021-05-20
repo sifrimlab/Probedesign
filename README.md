@@ -1,5 +1,5 @@
 # Probedesign
-## TODO: Explain here how to get this from docker with conda environment
+## Create conda environement using the provided probedesign.yml
 
 Download reference transcripts __"ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_37/gencode.v37.transcripts.fa.gz"__ and add them to the Inputs folder.
 
