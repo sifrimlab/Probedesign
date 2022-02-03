@@ -2,3 +2,10 @@
 .ipynb_checkpoints/
 .output/
 *.ipynb
+*.log*
+work
+nf_output
+.nextflow
+Genome-index2
+Genome-Index
+gencode*
