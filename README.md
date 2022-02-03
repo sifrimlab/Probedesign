@@ -1,6 +1,8 @@
 # Probedesign
 ## Create conda environement using the provided probedesign.yml
 
+*Work in progress*
+
 Download reference transcripts __"ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_37/gencode.v37.transcripts.fa.gz"__ and add them to the Inputs folder.
 
 To run the pipeline run command ```snakemake --snakefile snakemake_probedesign```
