@@ -9,3 +9,7 @@ nf_output
 Genome-index2
 Genome-Index
 gencode*
+samtools*
+Inputs
+Genomedir
+blastdb

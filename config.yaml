@@ -1,5 +1,5 @@
 files:
-    transcripts: Inputs/test_transcript_file.txt
+    transcripts: Inputs/transcript_file.txt
     gencode: Inputs/gencode.v37.transcripts.fa
     readout: Inputs/Readout_probes_information.csv
     barcode: Inputs/barcodes_merfish.csv
@@ -14,22 +14,22 @@ primers:
 
 
 output:
-    probes_for_alligning: Outputs/probes_for_alligning.fasta
-    complement_initial_probes: Outputs/complement_initial_probes.fasta
-    split_probes_for_alligning: Outputs/split_probes_for_alligning.fasta
-    split_complement_initial_probes: Outputs/split_complement_initial_probes.fasta
-    uniquely_mapped_probes: Outputs/mapped_reads/uniquely_mapped_probes-
-    uniquely_mapped_probes_probenames:  Outputs/mapped_reads/uniquely_mapped_probes_probenames.txt
-    uniquely_mapped_probes_selected_sam: Outputs/mapped_reads/uniquely_mapped_probes_selected.sam
-    split_complement_sequence: Outputs/split_complement_sequence.fasta
-    encoding_probes: Outputs/encoding_probes.fasta
-    filtered_probes: Outputs/filtered_probes.fasta
-    probe_stats: Results/probe_stats.csv
-    uniquely_mapped_probes_selected_probes_fasta: Results/uniquely_mapped_probes_filtered_final.fasta
-    complement_probes: Outputs/complement_probes.fasta
-    blastdb: Outputs/blastdb/complement_probes_db
-    blast_results: Results/blast_results.out
-    Final_Probe_results: Results/Final_Probe_results.csv
+    probes_for_alligning: probes_for_alligning.fasta
+    complement_initial_probes: complement_initial_probes.fasta
+    split_probes_for_alligning: split_probes_for_alligning.fasta
+    split_complement_initial_probes: split_complement_initial_probes.fasta
+    uniquely_mapped_probes: uniquely_mapped_probes-
+    uniquely_mapped_probes_probenames: uniquely_mapped_probes_probenames.txt
+    uniquely_mapped_probes_selected_sam: uniquely_mapped_probes_selected.sam
+    split_complement_sequence: split_complement_sequence.fasta
+    encoding_probes: encoding_probes.fasta
+    filtered_probes: filtered_probes.fasta
+    probe_stats: probe_stats.csv
+    uniquely_mapped_probes_filtered_final: uniquely_mapped_probes_filtered_final.fasta
+    complement_probes: complement_probes.fasta
+    blastdb: blastdb/complement_probes_db
+    blast_results: blast_results.out
+    Final_Probe_results: Final_Probe_results.csv
 
 
 
