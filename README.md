@@ -3,7 +3,9 @@
 
 *Work in progress*
 
-Download reference transcripts __"ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_37/gencode.v37.transcripts.fa.gz"__ and add them to the Inputs folder.
+Download reference transcripts __"wget ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_37/gencode.v37.transcripts.fa.gz"__ and add them to the Inputs folder.
+
+unzip the reference file __"gunzip gencode.v37.transcripts.fa.gz"__.
 
 To run the pipeline run command ```snakemake --snakefile snakemake_probedesign```
 For aditional snakemake command line specifications such as cores and threads check _https://snakemake.readthedocs.io/en/stable/executing/cli.html_.
