@@ -20,7 +20,7 @@ nextflow.enable.dsl=2
 
 params.outDir = "$baseDir/nf_output"
 params.gencode_file = "$baseDir/Inputs/gencode.v37.transcripts.fa"
-params.index_files = "$baseDir/Genomedir/"
+params.index_files = "/media/yob/Genome_Dir_GRCH38"
 params.readout_file = "Inputs/Readout_probes_information.csv"
 params.barcode_file = "Inputs/barcodes_merfish.csv"
 params.kmer_length = 30
@@ -28,20 +28,22 @@ params.kmer_overlap = 20
 
 
 process parse_transcripts{
+    cpus 8
     publishDir "$params.outDir", mode: 'copy'
 
     input:
-        path transcript_file
+        path gencode_file
 
     output:
         path "faidx_input.txt"
 
     script:
     """
-    python3 $baseDir/src/parse_transcripts.py $transcript_file
+    python3 $baseDir/src/parse_transcripts.py $gencode_file
     """
 }
 process transcript_sequence{
+    cpus 8
     publishDir "$params.outDir/", mode: 'copy'
 
     input:
@@ -51,12 +53,13 @@ process transcript_sequence{
         path "complement_initial_probes.fasta", emit: complement_initial_probes
 
         """
-        faidx  ${params.gencode_file} `cat ${faidx_input}` > probes_for_alligning.fasta
-        faidx --complement ${params.gencode_file} `cat ${faidx_input}` > complement_initial_probes.fasta
+        faidx  ${params.gencode_file} `${faidx_input}` > probes_for_alligning.fasta
+        faidx --complement ${params.gencode_file} `${faidx_input}` > complement_initial_probes.fasta
         """
 }
 
 process split_sequence{
+    cpus 8
   publishDir "$params.outDir/", mode: 'copy'
     input:
         path probes_for_alligning
@@ -75,6 +78,7 @@ process split_sequence{
 }
 
 process allign_probes{
+    cpus 8
   publishDir "$params.outDir/", mode: 'copy'
     input:
         path split_probes_for_alligning
@@ -89,6 +93,7 @@ process allign_probes{
 }
 
 process select_alligned{
+    cpus 8
     publishDir "$params.outDir/", mode: 'copy'
     input:
       path uniquely_mapped_probes_Aligned
@@ -109,6 +114,7 @@ process select_alligned{
 }
 
 process design_probes{
+    cpus 8
     publishDir "$params.outDir/", mode: 'copy'
     input:
         path split_complement_initial_probes
@@ -116,11 +122,12 @@ process design_probes{
         path "encoding_probes.fasta", emit: encoding_probes
     script:
         """
-        python3 $baseDir/src/probedesign.py $baseDir/config.yaml $baseDir $baseDir/nf_output
+        python3 $baseDir/src/probedesign.py $baseDir/config.yaml $baseDir $baseDir/nf_output $split_complement_initial_probes
         """
 }
 
 process filter_probes{
+    cpus 8
     publishDir "$params.outDir/", mode: 'copy'
     input:
         path encoding_probes
@@ -135,6 +142,7 @@ process filter_probes{
 }
 
 process complement_sequence_probes{
+    cpus 8
     publishDir "$params.outDir/", mode: 'copy'
     input:
         path filtered_probes
@@ -147,6 +155,7 @@ process complement_sequence_probes{
         """
 }
 process create_blastdb{
+    cpus 8
     publishDir "$params.outDir/", mode: 'copy'
     input:
         path uniquely_mapped_probes_filtered_final
@@ -163,6 +172,7 @@ process create_blastdb{
 }
 
 process blast_probes{
+    cpus 8
     publishDir "$params.outDir/", mode: 'copy'
     input:
        val complement_probes_blastdb
@@ -176,6 +186,7 @@ process blast_probes{
 }
 
 process probe_results{
+    cpus 8
     publishDir "$params.outDir/", mode: 'copy'
     input:
       path probe_stats
@@ -189,7 +200,7 @@ process probe_results{
 }
 
 workflow{
-  parse_transcripts("$baseDir/Inputs/transcript_file.txt")
+  parse_transcripts(params.gencode_file)
   transcript_sequence(parse_transcripts.out)
   split_sequence(transcript_sequence.out)
   allign_probes(split_sequence.out.split_probes_for_alligning)
