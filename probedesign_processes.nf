@@ -20,6 +20,7 @@ nextflow.enable.dsl=2
 
 params.outDir = "$baseDir/nf_output"
 params.gencode_file = "$baseDir/Inputs/gencode.v37.transcripts.fa"
+params.transcript_file = "$baseDir/Inputs/transcript_file.txt"
 params.index_files = "/media/yob/Genome_Dir_GRCH38"
 params.readout_file = "Inputs/Readout_probes_information.csv"
 params.barcode_file = "Inputs/barcodes_merfish.csv"
@@ -32,30 +33,16 @@ process parse_transcripts{
     publishDir "$params.outDir", mode: 'copy'
 
     input:
-        path gencode_file
+        path transcript_file
 
-    output:
-        path "faidx_input.txt"
-
-    script:
-    """
-    python3 $baseDir/src/parse_transcripts.py $gencode_file
-    """
-}
-process transcript_sequence{
-    cpus 8
-    publishDir "$params.outDir/", mode: 'copy'
-
-    input:
-        path faidx_input
     output:
         path "probes_for_alligning.fasta", emit: probes_for_alligning
         path "complement_initial_probes.fasta", emit: complement_initial_probes
 
-        """
-        faidx  ${params.gencode_file} `${faidx_input}` > probes_for_alligning.fasta
-        faidx --complement ${params.gencode_file} `${faidx_input}` > complement_initial_probes.fasta
-        """
+    script:
+    """
+    python3 $baseDir/src/parse_transcripts.py $params.transcript_file $params.gencode_file
+    """
 }
 
 process split_sequence{
@@ -137,7 +124,7 @@ process filter_probes{
         path "probe_stats.csv", emit: probe_stats
     script:
         """
-        python $baseDir/src/filtering_probes.py $baseDir/config.yaml $baseDir $baseDir/nf_output
+        python $baseDir/src/filtering_probes.py $baseDir/config.yaml $baseDir $baseDir/nf_output  $uniquely_mapped_probes_probenames
         """
 }
 
@@ -161,7 +148,7 @@ process create_blastdb{
         path uniquely_mapped_probes_filtered_final
     output:
         path "complement_probes.fasta"
-        path "complement_probes_blastdb.nsq"
+        path "complement_probes_blastdb.nsq", emit:complement_probes_blastdb
     script:
         """
         mkdir -p $baseDir/blastdb
@@ -175,7 +162,7 @@ process blast_probes{
     cpus 8
     publishDir "$params.outDir/", mode: 'copy'
     input:
-       val complement_probes_blastdb
+       path complement_probes_blastdb
        path uniquely_mapped_probes_filtered_final
     output:
        path "blast_results.out"
@@ -200,15 +187,14 @@ process probe_results{
 }
 
 workflow{
-  parse_transcripts(params.gencode_file)
-  transcript_sequence(parse_transcripts.out)
-  split_sequence(transcript_sequence.out)
+  parse_transcripts(params.transcript_file)
+  split_sequence(parse_transcripts.out)
   allign_probes(split_sequence.out.split_probes_for_alligning)
   select_alligned(allign_probes.out)
   design_probes(split_sequence.out.split_complement_initial_probes)
   filter_probes(design_probes.out,select_alligned.out.uniquely_mapped_probes_probenames)
   complement_sequence_probes(filter_probes.out.filtered_probes,select_alligned.out.uniquely_mapped_probes_probenames)
   create_blastdb(complement_sequence_probes.out)
-  blast_probes("complement_probes_blastdb",complement_sequence_probes.out)
+  blast_probes(create_blastdb.out.complement_probes_blastdb,complement_sequence_probes.out)
   probe_results(filter_probes.out.probe_stats,complement_sequence_probes.out)
 }
