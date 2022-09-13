@@ -6,7 +6,7 @@ Takes as input transcript ids (ENST00000456328.2) and will result in a folder th
 The filtering requirements can be changed here aswell to achieve the desired probes. A ```Final_Probe_results.csv``` will give information about total created and filtered probes incuding how many probes per transcript are remaining.
 
 
-## Create conda environement using the provided probedesign.yml
+Create conda environement using the provided probedesign.yml
 
 Download reference transcripts __"wget ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_37/gencode.v37.transcripts.fa.gz"__ and add them to the Inputs folder.
 
