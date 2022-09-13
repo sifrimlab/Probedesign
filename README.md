@@ -1,6 +1,6 @@
 # Probedesign
 
-*Work in progress*
+##*Work in progress*
 
 Takes as input transcript ids (ENST00000456328.2) and will result in a folder that contains a fasta file with the resulting filtered probes and probe stats including all the created probes with their values, in a table csv format.
 The filtering requirements can be changed here aswell to achieve the desired probes. A ```Final_Probe_results.csv``` will give information about total created and filtered probes incuding how many probes per transcript are remaining.
