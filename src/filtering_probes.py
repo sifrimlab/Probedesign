@@ -13,6 +13,7 @@ from csv import DictWriter
 config = yaml.load(open(sys.argv[1],'r'), Loader=yaml.FullLoader)
 baseDir = sys.argv[2]
 outputDir = sys.argv[3]
+uniquely_mapped_probes_probenames = open(sys.argv[4])
 
 # Filtering probes based on predefined values, creating a probe stats csv for downstream freedom of changing filters to achieve desired probes.
 
@@ -31,7 +32,7 @@ tempupperbound = config["parameters"]["Temp_upper_bound"]
 probe_length = config["parameters"]["probe_length"]
 
 outputfasta = config["output"]["filtered_probes"]
-uniquely_mapped_probes_probenames = open(os.path.join(outputDir,config["output"]["uniquely_mapped_probes_probenames"]))
+# uniquely_mapped_probes_probenames = open(os.path.join(outputDir,config["output"]["uniquely_mapped_probes_probenames"]))
 filtered_names = uniquely_mapped_probes_probenames.read().splitlines()
 probe_stats = config["output"]["probe_stats"]
 
