@@ -7,12 +7,17 @@ The filtering requirements can be changed here aswell to achieve the desired pro
 
 
 Create conda environement using the provided probedesign.yml
+additionally install following packages:
+'conda install -c bioconda pyfasta
+conda install -c bioconda pyfaidx
+conda install -c bioconda star
+pip install pyyaml'
 
 Download reference transcripts __"wget ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_37/gencode.v37.transcripts.fa.gz"__ and add them to the Inputs folder.
 
 unzip the reference file __"gunzip gencode.v37.transcripts.fa.gz"__.
 
-Generate latest reference genome index using STAR
+Generate latest reference genome index using STAR.
 
 In probedesign_processes.nf edit the params to match the location of the transcript files,genome index and specify an output folder.
 
