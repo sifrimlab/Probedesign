@@ -23,7 +23,7 @@ __" http://ftp.ensembl.org/pub/release-107/gtf/homo_sapiens/Homo_sapiens.GRCh38.
 unzip these files with gunzip
 
 Generate latest reference genome index using STAR.
-__" STAR --runThreadN 40 --runMode genomeGenerate --genomeDir Genome_Dir_GRCH38 --genomeFastaFiles Genome_Index/Homo_sapiens.GRCh38.dna.primary_assembly.fa --sjdbGTFfile Genome_Index/Homo_sapiens.GRCh38.107.gtf"__
+__" STAR --runThreadN 40 --runMode genomeGenerate --genomeDir Genome_Dir_GRCH38 --genomeFastaFiles genome_Index/Homo_sapiens.GRCh38.dna.primary_assembly.fa --sjdbGTFfile genome_Index/Homo_sapiens.GRCh38.107.gtf"__
 
 In probedesign_processes.nf edit the params to match the location of the transcript files,genome index and specify an output folder.
 
