@@ -13,7 +13,9 @@ Download reference transcripts __"wget ftp://ftp.ebi.ac.uk/pub/databases/gencode
 unzip the reference file in the inputs folder __"gunzip gencode.v37.transcripts.fa.gz"__.
 
 Download the latest reference genome with accompanying GTF file in a folder :
+
 mkdir genome_index 
+
 cd genome_index 
 
 __" wget http://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz"__ 
