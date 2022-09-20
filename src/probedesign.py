@@ -30,13 +30,14 @@ if __name__ == "__main__":
     config = yaml.load(open(sys.argv[1],'r'), Loader=yaml.FullLoader)
     baseDir = sys.argv[2]
     outputDir = sys.argv[3]
+    split_complement_initial_probes = sys.argv[4]
     transcript_file = os.path.join(baseDir,config["files"]["transcripts"])
     barcode_file = os.path.join(baseDir,config["files"]["barcode"])
     readout_file = os.path.join(baseDir,config["files"]["readout"])
     fw_primer = Seq(config["primers"]["forward"])
     rv_primer = Seq(config["primers"]["reverse"])
     outputfasta = config["output"]["encoding_probes"]
-    split_complement_initial_probes = os.path.join(outputDir,config["output"]["split_complement_initial_probes"])
+#     split_complement_initial_probes = os.path.join(outputDir,config["output"]["split_complement_initial_probes"])
 
     results = {}
     with open(readout_file, newline='') as csvfile:
