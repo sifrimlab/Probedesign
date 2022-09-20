@@ -20,7 +20,10 @@ nextflow.enable.dsl=2
 
 params.outDir = "$baseDir/nf_output"
 params.gencode_file = "$baseDir/Inputs/gencode.v37.transcripts.fa"
+<<<<<<< HEAD
 // params.transcript_file = "$baseDir/Inputs/transcript_file_2.txt"
+=======
+>>>>>>> 97124bca6d7c9bc2e5331b7c54c88d48f16f2b41
 params.transcript_file = "$baseDir/Inputs/transcript_file.txt"
 params.index_files = "/media/yob/Genome_Dir_GRCH38"
 params.readout_file = "Inputs/Readout_probes_information.csv"
@@ -148,9 +151,14 @@ process create_blastdb{
     input:
         path uniquely_mapped_probes_filtered_final
     output:
+<<<<<<< HEAD
          path "complement_probes*"
 //        path "complement_probes.fasta"
 //        path "complement_probes_blastdb.nsq", emit:complement_probes_blastdb
+=======
+        path "complement_probes.fasta"
+        path "complement_probes_blastdb.nsq", emit:complement_probes_blastdb
+>>>>>>> 97124bca6d7c9bc2e5331b7c54c88d48f16f2b41
     script:
         """
         mkdir -p $baseDir/blastdb
@@ -196,6 +204,10 @@ workflow{
   filter_probes(design_probes.out,select_alligned.out.uniquely_mapped_probes_probenames)
   complement_sequence_probes(filter_probes.out.filtered_probes,select_alligned.out.uniquely_mapped_probes_probenames)
   create_blastdb(complement_sequence_probes.out)
+<<<<<<< HEAD
   blast_probes(create_blastdb.out.collect(),complement_sequence_probes.out)
+=======
+  blast_probes(create_blastdb.out.complement_probes_blastdb,complement_sequence_probes.out)
+>>>>>>> 97124bca6d7c9bc2e5331b7c54c88d48f16f2b41
   probe_results(filter_probes.out.probe_stats,complement_sequence_probes.out)
 }
